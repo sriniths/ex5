@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .converter-container {
+            background-color: #fff;
+            padding: 2em;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1em;
+        }
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5em;
+            gap: 1em;
+        }
+        .input-group input,
+        .input-group select {
+            width: 50%;
+            padding: 0.8em;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .input-group input {
+            text-align: right;
+        }
+        .swap-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 0.7em;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+        .swap-button:hover {
+            background-color: #0056b3;
+        }
+        .result-container {
+            margin-top: 1.5em;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: 1px solid #ddd;
+            padding: 1em;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .result-container span {
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="converter-container">
+        <h1>Currency Converter</h1>
+
+        <div class="input-group">
+            <input type="number" id="amount" value="1" min="0">
+            <select id="from-currency">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="JPY">JPY</option>
+                <option value="INR" selected>INR</option>
+            </select>
+        </div>
+        
+        <button class="swap-button" onclick="swapCurrencies()">⇅</button>
+
+        <div class="input-group">
+            <input type="number" id="converted-amount" readonly>
+            <select id="to-currency">
+                <option value="USD" selected>USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="JPY">JPY</option>
+                <option value="INR">INR</option>
+            </select>
+        </div>
+
+        <div class="result-container">
+            <p id="exchange-rate-display">
+                <span>1.00 INR = 0.012 USD</span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Exchange rates relative to INR (Indian Rupee)
+        const exchangeRates = {
+            "INR": 1,
+            "USD": 0.012,
+            "EUR": 0.011,
+            "GBP": 0.0095,
+            "JPY": 1.76,
+        };
+
+        const amountInput = document.getElementById("amount");
+        const fromCurrencySelect = document.getElementById("from-currency");
+        const toCurrencySelect = document.getElementById("to-currency");
+        const convertedAmountInput = document.getElementById("converted-amount");
+        const exchangeRateDisplay = document.getElementById("exchange-rate-display");
+
+        // Function to perform the conversion
+        function convertCurrency() {
+            const amount = parseFloat(amountInput.value);
+            const fromCurrency = fromCurrencySelect.value;
+            const toCurrency = toCurrencySelect.value;
+
+            if (isNaN(amount) || amount <= 0) {
+                convertedAmountInput.value = "";
+                exchangeRateDisplay.innerHTML = "<span>Please enter a valid amount.</span>";
+                return;
+            }
+
+            const fromRate = exchangeRates[fromCurrency];
+            const toRate = exchangeRates[toCurrency];
+
+            if (fromRate && toRate) {
+                const convertedAmount = (amount / fromRate) * toRate;
+                convertedAmountInput.value = convertedAmount.toFixed(2);
+                
+                const rate = (1 / fromRate) * toRate;
+                exchangeRateDisplay.innerHTML = `<span>1.00 ${fromCurrency} = ${rate.toFixed(4)} ${toCurrency}</span>`;
+            } else {
+                convertedAmountInput.value = "Error";
+                exchangeRateDisplay.innerHTML = "<span>Invalid currency selection.</span>";
+            }
+        }
+
+        // Function to swap currencies
+        function swapCurrencies() {
+            const temp = fromCurrencySelect.value;
+            fromCurrencySelect.value = toCurrencySelect.value;
+            toCurrencySelect.value = temp;
+            convertCurrency();
+        }
+
+        // Add event listeners for instant updates
+        amountInput.addEventListener("input", convertCurrency);
+        fromCurrencySelect.addEventListener("change", convertCurrency);
+        toCurrencySelect.addEventListener("change", convertCurrency);
+
+        // Initial conversion on page load
+        convertCurrency();
+    </script>
+
+</body>
+</html>
